@@ -5,6 +5,10 @@
     cd smap-kor
     yo hubot
     - Owner       : u4bi
-    - Bot name    : samp-kor
+    - Bot name    : samp-bot
     - Description : samp korea bot
     - Bot adapter : campfire
+
+##### hubot 실행
+    bin/hubot
+    samp-bot help
