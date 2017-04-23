@@ -10,16 +10,16 @@
 
 module.exports = (robot) ->
 
-  # robot.hear /badger/i, (res) ->
-  #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
-  #
-  # robot.respond /open the (.*) doors/i, (res) ->
-  #   doorType = res.match[1]
-  #   if doorType is "pod bay"
-  #     res.reply "I'm afraid I can't let you do that."
-  #   else
-  #     res.reply "Opening #{doorType} doors"
-  #
+  robot.hear /test/i, (res) ->
+    res.send "테스트 테스트"
+  
+  robot.respond /너는 (.*) 좋아해?/i, (res) ->
+    name = res.match[1]
+    if name is "명재"
+      res.reply "아니! 나는 유명재가 너무 싫어!"
+    else
+      res.reply "응 #{name} 좋아해"
+  
   # robot.hear /I like pie/i, (res) ->
   #   res.emote "makes a freshly baked pie"
   #
