@@ -44,7 +44,7 @@ getDust = (msg, geoCode, location) ->
       weather = {
           temp : data.main.temp
           humi : getHumi(data.main.humidity)
-          stat : getStat(data.weather[0].id) 
+          stat : getStat(data.weather[0].id)
           clud : getClud(data.clouds.all)
       }
       msg.send "온도는 #{weather.temp}도로"
@@ -68,10 +68,19 @@ getClud = (value) ->
     when value < 80 then '많은'
     else '매우 많은'
 
+# getStat = (value) ->
+#   switch value
+#     when 800 then '맑은 하늘의'
+#     when 801 then '구름이 매우 없는'
+#     when 802 then '드문드문 구름이 낀'
+#     when 300 then '쨍쨍한 햇볕의 이슬비가 내리는'
+#     else value
+
 getStat = (value) ->
-  switch value
-    when 800 then '맑은 하늘의'
-    when 801 then '구름이 매우 없는'
-    when 802 then '드문드문 구름이 낀'
-    when 300 then '쨍쨍한 햇볕의 이슬비가 내리는'
-    else value
+  stats = {
+      '800' : '맑은 하늘의'
+      '801' : '구름이 매우 없는'
+      '802' : '드문드문 구름이 낀'
+      '300' : '쨍쨍한 햇볕의 이슬비가 내리는'
+  }
+  stats[value]
