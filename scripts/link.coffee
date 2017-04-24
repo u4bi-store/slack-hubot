@@ -3,5 +3,5 @@
 
 module.exports = (robot) ->
 
-  robot.respond /깃주소|깃링크$/, (msg) ->
-    msg.send "https://github.com/u4bi"
+  robot.respond /깃주소|깃링크$/, (res) ->
+    res.send "https://github.com/u4bi"
