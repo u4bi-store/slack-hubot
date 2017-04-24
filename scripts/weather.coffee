@@ -35,28 +35,28 @@ getGeocode = (msg, location) ->
   return deferred.promise
 
 getDust = (msg, geoCode, location) ->
-  msg.send ""
-  msg.send "#{location}의 날씨 정보는?"
   msg.http("http://api.openweathermap.org/data/2.5/weather?lat=#{geoCode.lat}&lon=#{geoCode.lng}&units=metric&appid=c557a988de6d87fdd326685a123ac733")
     .get() (err, res, body) ->
       data = JSON.parse(body)
       
       weather = {
           temp : data.main.temp
-          humi : getHumi(data.main.humidity)
-          stat : getStat(data.weather[0].id)
-          clud : getClud(data.clouds.all)
+          wind : data.wind.speed
+          wdeg : data.wind.deg
+          humi : data.main.humidity
+          clud : data.clouds.all
       }
-      msg.send "온도는 #{weather.temp}도로"
-      msg.send "습도는 #{weather.humi}편이며"
-      msg.send "#{weather.stat} 날씨로"
-      msg.send "구름은 #{weather.clud}편입니다"
+
+      msg.send "현재 #{location}의 날씨 정보는?"
+      msg.send "기온은 #{weather.temp}˚로"
+      msg.send "풍향은 #{getWind(weather.wdeg)}(#{weather.wdeg})을 향해 풍속 #{weather.wind}m/s로 불며"
+      msg.send "습도는 #{getHumi(data.main.humidity)}(#{data.main.humidity}%)편으로 구름은 #{getClud(weather.clud)}(#{weather.clud}%)편입니다"
 
 getHumi = (value) ->
   switch
     when value < 20 then '매우 낮은'
     when value < 40 then '낮은'
-    when value < 60 then '보통'
+    when value < 60 then '평범한'
     when value < 80 then '높은'
     else '매우 높은'
 
@@ -64,23 +64,17 @@ getClud = (value) ->
   switch
     when value < 20 then '매우 적은'
     when value < 40 then '적은'
-    when value < 60 then '보통'
+    when value < 60 then '평범한'
     when value < 80 then '많은'
     else '매우 많은'
 
-# getStat = (value) ->
-#   switch value
-#     when 800 then '맑은 하늘의'
-#     when 801 then '구름이 매우 없는'
-#     when 802 then '드문드문 구름이 낀'
-#     when 300 then '쨍쨍한 햇볕의 이슬비가 내리는'
-#     else value
-
-getStat = (value) ->
-  stats = {
-      '800' : '맑은 하늘의'
-      '801' : '구름이 매우 없는'
-      '802' : '드문드문 구름이 낀'
-      '300' : '쨍쨍한 햇볕의 이슬비가 내리는'
-  }
-  stats[value]
+getWind = (value) ->
+  switch
+    when value < 45 then '북동풍'
+    when value < 90 then '동풍'
+    when value < 145 then '남동풍'
+    when value < 180 then '남풍'
+    when value < 225 then '남서풍'
+    when value < 270 then '서풍'
+    when value < 315 then '북서풍'
+    when value < 360 then '북풍'
