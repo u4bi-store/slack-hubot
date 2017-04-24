@@ -6,7 +6,8 @@
   "description": "samp korea bot",
   "dependencies": {
     "hubot": "^2.19.0",
-    "hubot-help": "^0.2.0"
+    "hubot-help": "^0.2.0",
+    "q": "^1.4.1"    
   },
   "engines": {
     "node": "0.10.x"
