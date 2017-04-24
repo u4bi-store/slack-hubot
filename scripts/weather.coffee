@@ -39,7 +39,15 @@ getDust = (msg, geoCode, location) ->
   msg.http("http://api.openweathermap.org/data/2.5/weather?lat=#{geoCode.lat}&lon=#{geoCode.lng}&units=metric&appid=c557a988de6d87fdd326685a123ac733")
     .get() (err, res, body) ->
       data = JSON.parse(body)
-      msg.send "온도 #{data.main.temp}도"
-      msg.send "습도 #{data.main.humidity}%"
-      msg.send "날씨 #{data.weather[0].id}"
-      msg.send "구름 #{data.clouds.all}%"
+      
+      weather = {
+          temp : data.main.temp
+          humi : data.main.humidity
+          stat : data.weather[0].id 
+          clud : data.clouds.all
+      }
+
+      msg.send "온도 #{weather.temp}도"
+      msg.send "습도 #{weather.humi}%"
+      msg.send "날씨 #{weather.stat}"
+      msg.send "구름 #{weather.clud}%"
