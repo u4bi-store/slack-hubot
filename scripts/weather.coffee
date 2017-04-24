@@ -48,10 +48,10 @@ getDust = (msg, geoCode, location) ->
           clud : data.clouds.all
       }
 
-      msg.send "현재 #{location}의 날씨 정보는?"
-      msg.send "기온은 `#{weather.temp}˚`로 `#{weather.stat}` 날씨로 관측됩니다."
-      msg.send "풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불며"
-      msg.send "습도는 `#{getHumi(data.main.humidity)}(#{data.main.humidity}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
+      msg.send "현재 #{location}의 날씨 정보는"+
+      " 기온은 `#{weather.temp}˚`로 `#{weather.stat}` 날씨로 관측되며"+
+      " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
+      " 습도는 `#{getHumi(data.main.humidity)}(#{data.main.humidity}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
 
 getHumi = (value) ->
   switch
