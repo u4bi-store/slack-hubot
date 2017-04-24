@@ -41,6 +41,7 @@ getDust = (msg, geoCode, location) ->
       
       weather = {
           temp : data.main.temp
+          stat : getStat(data.weather[0].id)
           wind : data.wind.speed
           wdeg : data.wind.deg
           humi : data.main.humidity
@@ -48,7 +49,7 @@ getDust = (msg, geoCode, location) ->
       }
 
       msg.send "현재 #{location}의 날씨 정보는?"
-      msg.send "기온은 `#{weather.temp}˚`로"
+      msg.send "기온은 `#{weather.temp}˚`로 `#{weather.stat}`한 날씨로 보입니다."
       msg.send "풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불며"
       msg.send "습도는 `#{getHumi(data.main.humidity)}(#{data.main.humidity}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
 
@@ -78,3 +79,80 @@ getWind = (value) ->
     when value < 270 then '서풍'
     when value < 315 then '북서풍'
     when value < 360 then '북풍'
+
+getStat = (value) ->
+  stats = {
+    '200' : ''
+    '201' : ''
+    '202' : ''
+    '210' : ''
+    '211' : ''
+    '212' : ''
+    '221' : ''
+    '230' : ''
+    '231' : ''
+    '232' : ''
+    '300' : ''
+    '301' : ''
+    '302' : ''
+    '310' : ''
+    '311' : ''
+    '312' : ''
+    '313' : ''
+    '314' : ''
+    '321' : ''
+    '500' : ''
+    '501' : ''
+    '502' : ''
+    '503' : ''
+    '504' : ''
+    '511' : ''
+    '520' : ''
+    '521' : ''
+    '522' : ''
+    '531' : ''
+    '600' : ''
+    '601' : ''
+    '602' : ''
+    '612' : ''
+    '615' : ''
+    '616' : ''
+    '620' : ''
+    '621' : ''
+    '622' : ''
+    '701' : ''
+    '711' : ''
+    '721' : ''
+    '731' : ''
+    '741' : ''
+    '751' : ''
+    '761' : ''
+    '762' : ''
+    '771' : ''
+    '781' : ''
+    '800' : ''
+    '801' : ''
+    '802' : ''
+    '803' : ''
+    '804' : ''
+    '900' : ''
+    '901' : ''
+    '902' : ''
+    '903' : ''
+    '904' : ''
+    '905' : ''
+    '906' : ''
+    '951' : ''
+    '952' : ''
+    '953' : ''
+    '954' : ''
+    '955' : ''
+    '956' : ''
+    '957' : ''
+    '958' : ''
+    '959' : ''
+    '960' : ''
+    '961' : ''
+    '962' : ''
+  }
+  stats[value]
