@@ -35,6 +35,7 @@ getGeocode = (msg, location) ->
   return deferred.promise
 
 getDust = (msg, geoCode, location) ->
+  msg.send ""
   msg.send "#{location}의 날씨 정보는?"
   msg.http("http://api.openweathermap.org/data/2.5/weather?lat=#{geoCode.lat}&lon=#{geoCode.lng}&units=metric&appid=c557a988de6d87fdd326685a123ac733")
     .get() (err, res, body) ->
@@ -42,12 +43,34 @@ getDust = (msg, geoCode, location) ->
       
       weather = {
           temp : data.main.temp
-          humi : data.main.humidity
-          stat : data.weather[0].id 
-          clud : data.clouds.all
+          humi : getHumi(data.main.humidity)
+          stat : getStat(data.weather[0].id) 
+          clud : getClud(data.clouds.all)
       }
+      msg.send "온도는 #{weather.temp}도로"
+      msg.send "습도는 #{weather.humi}편이며"
+      msg.send "#{weather.stat} 날씨로"
+      msg.send "구름은 #{weather.clud}편입니다"
 
-      msg.send "온도 #{weather.temp}도"
-      msg.send "습도 #{weather.humi}%"
-      msg.send "날씨 #{weather.stat}"
-      msg.send "구름 #{weather.clud}%"
+getHumi = (value) ->
+  switch
+    when value < 20 then '매우 낮은'
+    when value < 40 then '낮은'
+    when value < 60 then '보통'
+    when value < 80 then '높은'
+    else '매우 높은'
+
+getClud = (value) ->
+  switch
+    when value < 20 then '매우 적은'
+    when value < 40 then '적은'
+    when value < 60 then '보통'
+    when value < 80 then '많은'
+    else '매우 많은'
+
+getStat = (value) ->
+  switch value
+    when 800 then '맑은 하늘의'
+    when 801 then '구름이 매우 없는'
+    when 300 then '쨍쨍한 햇볕의 이슬비가 내리는'
+    else value
