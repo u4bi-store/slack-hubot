@@ -72,5 +72,6 @@ getStat = (value) ->
   switch value
     when 800 then '맑은 하늘의'
     when 801 then '구름이 매우 없는'
+    when 802 then '드문드문 구름이 낀'
     when 300 then '쨍쨍한 햇볕의 이슬비가 내리는'
     else value
