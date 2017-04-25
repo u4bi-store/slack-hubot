@@ -75,7 +75,7 @@ getWind = (value) ->
     when value < 270 then '서풍'
     when value < 315 then '북서풍'
     when value < 360 then '북풍'
-    else value = '관측 정보 없음' 
+    else '관측 정보 없음' 
 
 send = (msg, location, weather) ->
   msg.http("https://raw.githubusercontent.com/u4bi/samp-hubot/master/assets/weather.json")
