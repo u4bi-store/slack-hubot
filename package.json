@@ -5,6 +5,7 @@
   "author": "u4bi",
   "description": "samp korea bot",
   "dependencies": {
+    "cron": "^1.2.1",
     "hubot": "^2.19.0",
     "hubot-help": "^0.2.0",
     "moment": "^2.18.1",
