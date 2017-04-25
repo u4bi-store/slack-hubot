@@ -11,6 +11,10 @@ module.exports = (robot) ->
     getGeocode(msg, location)
     .then (geoCode) ->
         getWeather(msg, geoCode, location)
+        .then (weather) ->
+            send(msg, weather)
+        .catch ->
+            msh.send '기상 불러오기를 실패하였습니다.'
     .catch ->
         msg.send '지역 불러오기를 실패하였습니다.'
 
@@ -35,10 +39,10 @@ getGeocode = (msg, location) ->
   return deferred.promise
 
 getWeather = (msg, geoCode, location) ->
+  defer = q.defer()
   msg.http("http://api.openweathermap.org/data/2.5/weather?lat=#{geoCode.lat}&lon=#{geoCode.lng}&units=metric&appid=c557a988de6d87fdd326685a123ac733")
     .get() (err, res, body) ->
       data = JSON.parse(body)
-      
       weather = {
           temp : data.main.temp
           stat : data.weather[0].id
@@ -46,14 +50,16 @@ getWeather = (msg, geoCode, location) ->
           wdeg : data.wind.deg
           humi : data.main.humidity
           clud : data.clouds.all
+          location : location
       }
-      send(msg, location, weather)
+      defer.resolve(weather)
+  return defer.promise
 
-send = (msg, location, weather) ->
+send = (msg, weather) ->
   msg.http("https://raw.githubusercontent.com/u4bi/samp-hubot/master/assets/weather.json")
     .get() (err, res, body) ->
       stats = JSON.parse(body)
-      msg.send "현재 #{location}의 날씨 정보는"+
+      msg.send "현재 #{weather.location}의 날씨 정보는"+
       " 기온은 `#{weather.temp}˚`로 `#{stats[weather.stat]}` 날씨로 관측되며"+
       " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
       " 습도는 `#{getHumi(weather.humi)}(#{weather.humi}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
