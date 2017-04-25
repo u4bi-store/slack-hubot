@@ -49,6 +49,15 @@ getWeather = (msg, geoCode, location) ->
       }
       send(msg, location, weather)
 
+send = (msg, location, weather) ->
+  msg.http("https://raw.githubusercontent.com/u4bi/samp-hubot/master/assets/weather.json")
+    .get() (err, res, body) ->
+      stats = JSON.parse(body)
+      msg.send "현재 #{location}의 날씨 정보는"+
+      " 기온은 `#{weather.temp}˚`로 `#{stats[weather.stat]}` 날씨로 관측되며"+
+      " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
+      " 습도는 `#{getHumi(weather.humi)}(#{weather.humi}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
+      
 getHumi = (value) ->
   switch
     when value < 20 then '매우 낮은'
@@ -75,13 +84,4 @@ getWind = (value) ->
     when value < 270 then '서풍'
     when value < 315 then '북서풍'
     when value < 360 then '북풍'
-    else '관측 정보 없음' 
-
-send = (msg, location, weather) ->
-  msg.http("https://raw.githubusercontent.com/u4bi/samp-hubot/master/assets/weather.json")
-    .get() (err, res, body) ->
-      stats = JSON.parse(body)
-      msg.send "현재 #{location}의 날씨 정보는"+
-      " 기온은 `#{weather.temp}˚`로 `#{stats[weather.stat]}` 날씨로 관측되며"+
-      " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
-      " 습도는 `#{getHumi(weather.humi)}(#{weather.humi}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
+    else '관측 정보 없음'
