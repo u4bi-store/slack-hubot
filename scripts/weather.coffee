@@ -10,7 +10,7 @@ module.exports = (robot) ->
     location = decodeURIComponent(unescape(msg.match[1]))
     getGeocode(msg, location)
     .then (geoCode) ->
-        getDust(msg, geoCode, location)
+        getWeather(msg, geoCode, location)
     .catch ->
         msg.send '지역 불러오기를 실패하였습니다.'
 
@@ -34,24 +34,20 @@ getGeocode = (msg, location) ->
         deferred.reject(err)
   return deferred.promise
 
-getDust = (msg, geoCode, location) ->
+getWeather = (msg, geoCode, location) ->
   msg.http("http://api.openweathermap.org/data/2.5/weather?lat=#{geoCode.lat}&lon=#{geoCode.lng}&units=metric&appid=c557a988de6d87fdd326685a123ac733")
     .get() (err, res, body) ->
       data = JSON.parse(body)
       
       weather = {
           temp : data.main.temp
-          stat : getStat(data.weather[0].id)
+          stat : data.weather[0].id
           wind : data.wind.speed
           wdeg : data.wind.deg
           humi : data.main.humidity
           clud : data.clouds.all
       }
-
-      msg.send "현재 #{location}의 날씨 정보는"+
-      " 기온은 `#{weather.temp}˚`로 `#{weather.stat}` 날씨로 관측되며"+
-      " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
-      " 습도는 `#{getHumi(data.main.humidity)}(#{data.main.humidity}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
+      send(msg, location, weather)
 
 getHumi = (value) ->
   switch
@@ -81,80 +77,90 @@ getWind = (value) ->
     when value < 360 then '북풍'
     else value = '관측 정보 없음' 
 
-getStat = (value) ->
-  stats = {
-    '200' : 'hunderstorm with light rain'
-    '201' : 'thunderstorm with rain'
-    '202' : 'thunderstorm with heavy rain'
-    '210' : 'light thunderstorm'
-    '211' : 'thunderstorm'
-    '212' : 'heavy thunderstorm'
-    '221' : 'ragged thunderstorm'
-    '230' : 'thunderstorm with light drizzle'
-    '231' : 'thunderstorm with drizzle'
-    '232' : 'thunderstorm with heavy drizzle'
-    '300' : 'light intensity drizzle'
-    '301' : 'drizzle'
-    '302' : 'heavy intensity drizzle'
-    '310' : 'light intensity drizzle rain'
-    '311' : 'drizzle rain'
-    '312' : 'heavy intensity drizzle rain'
-    '313' : 'shower rain and drizzle'
-    '314' : 'heavy shower rain and drizzle'
-    '321' : 'shower drizzle'
-    '500' : 'light rain'
-    '501' : 'moderate rain'
-    '502' : 'heavy intensity rain'
-    '503' : 'very heavy rain'
-    '504' : 'extreme rain'
-    '511' : 'freezing rain'
-    '520' : 'light intensity shower rain'
-    '521' : 'shower rain'
-    '522' : 'heavy intensity shower rain'
-    '531' : 'ragged shower rain'
-    '600' : 'light snow'
-    '601' : 'snow'
-    '602' : 'heavy snow'
-    '611' : 'sleet'
-    '612' : 'shower sleet'
-    '615' : 'light rain and snow'
-    '616' : 'rain and snow'
-    '620' : 'light shower snow'
-    '621' : 'shower snow'
-    '622' : 'heavy shower snow'
-    '701' : 'mist'
-    '711' : 'smoke'
-    '721' : '안개가 낀 (haze)'
-    '731' : 'sand, dust whirls'
-    '741' : 'fog'
-    '751' : 'sand'
-    '761' : 'dust'
-    '762' : 'volcanic ash'
-    '771' : 'squalls'
-    '781' : 'torado'
-    '800' : 'clear sky'
-    '801' : 'few clouds'
-    '802' : '드문드문 구름이 낀 (scattered clouds)'
-    '803' : 'broken clouds'
-    '804' : 'overcast clouds'
-    '900' : 'tornado'
-    '901' : 'tropical storm'
-    '902' : 'hurricane'
-    '903' : 'cold'
-    '904' : 'hot'
-    '905' : 'windy'
-    '906' : 'hail'
-    '951' : 'calm'
-    '952' : 'light breeze'
-    '953' : 'gentle breeze'
-    '954' : 'moderate breeze'
-    '955' : 'fresh breeze'
-    '956' : 'strong breeze'
-    '957' : 'high wind, near gale'
-    '958' : 'gale'
-    '959' : 'severe gale'
-    '960' : 'storm'
-    '961' : 'violent storm'
-    '962' : 'hurricane'
-  }
-  stats[value]
+send = (msg, location, weather) ->
+  msg.http("https://raw.githubusercontent.com/u4bi/samp-hubot/master/assets/weather.json")
+    .get() (err, res, body) ->
+      stats = JSON.parse(body)
+      msg.send "현재 #{location}의 날씨 정보는"+
+      " 기온은 `#{weather.temp}˚`로 `#{stats[weather.stat]}` 날씨로 관측되며"+
+      " 풍향은 `#{getWind(weather.wdeg)}(#{weather.wdeg})`을 향해 풍속 `#{weather.wind}m/s`로 불고"+
+      " 습도는 `#{getHumi(weather.humi)}(#{weather.humi}%)`편으로 구름은 `#{getClud(weather.clud)}(#{weather.clud}%)`편입니다."
+
+    
+# getStat = (value) ->
+#   stats = {
+#     '200' : 'hunderstorm with light rain'
+#     '201' : 'thunderstorm with rain'
+#     '202' : 'thunderstorm with heavy rain'
+#     '210' : 'light thunderstorm'
+#     '211' : 'thunderstorm'
+#     '212' : 'heavy thunderstorm'
+#     '221' : 'ragged thunderstorm'
+#     '230' : 'thunderstorm with light drizzle'
+#     '231' : 'thunderstorm with drizzle'
+#     '232' : 'thunderstorm with heavy drizzle'
+#     '300' : 'light intensity drizzle'
+#     '301' : 'drizzle'
+#     '302' : 'heavy intensity drizzle'
+#     '310' : 'light intensity drizzle rain'
+#     '311' : 'drizzle rain'
+#     '312' : 'heavy intensity drizzle rain'
+#     '313' : 'shower rain and drizzle'
+#     '314' : 'heavy shower rain and drizzle'
+#     '321' : 'shower drizzle'
+#     '500' : 'light rain'
+#     '501' : 'moderate rain'
+#     '502' : 'heavy intensity rain'
+#     '503' : 'very heavy rain'
+#     '504' : 'extreme rain'
+#     '511' : 'freezing rain'
+#     '520' : 'light intensity shower rain'
+#     '521' : 'shower rain'
+#     '522' : 'heavy intensity shower rain'
+#     '531' : 'ragged shower rain'
+#     '600' : 'light snow'
+#     '601' : 'snow'
+#     '602' : 'heavy snow'
+#     '611' : 'sleet'
+#     '612' : 'shower sleet'
+#     '615' : 'light rain and snow'
+#     '616' : 'rain and snow'
+#     '620' : 'light shower snow'
+#     '621' : 'shower snow'
+#     '622' : 'heavy shower snow'
+#     '701' : 'mist'
+#     '711' : 'smoke'
+#     '721' : '안개가 낀 (haze)'
+#     '731' : 'sand, dust whirls'
+#     '741' : 'fog'
+#     '751' : 'sand'
+#     '761' : 'dust'
+#     '762' : 'volcanic ash'
+#     '771' : 'squalls'
+#     '781' : 'torado'
+#     '800' : 'clear sky'
+#     '801' : 'few clouds'
+#     '802' : '드문드문 구름이 낀 (scattered clouds)'
+#     '803' : 'broken clouds'
+#     '804' : 'overcast clouds'
+#     '900' : 'tornado'
+#     '901' : 'tropical storm'
+#     '902' : 'hurricane'
+#     '903' : 'cold'
+#     '904' : 'hot'
+#     '905' : 'windy'
+#     '906' : 'hail'
+#     '951' : 'calm'
+#     '952' : 'light breeze'
+#     '953' : 'gentle breeze'
+#     '954' : 'moderate breeze'
+#     '955' : 'fresh breeze'
+#     '956' : 'strong breeze'
+#     '957' : 'high wind, near gale'
+#     '958' : 'gale'
+#     '959' : 'severe gale'
+#     '960' : 'storm'
+#     '961' : 'violent storm'
+#     '962' : 'hurricane'
+#   }
+#   stats[value]
